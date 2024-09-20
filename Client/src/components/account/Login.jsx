@@ -27,18 +27,22 @@ const Wrapper = styled(Box)`
 
 const LoginAdjust = styled(Button)`
   text-transform: none;
-  background: #fb641b;
+  background: ${(props) => (props.active ? "#fff" : "#fb641b")};
+  color: ${(props) => (props.active ? "#2874f0" : "#fff")};
   height: 48px;
   border-radius: 2px;
+  box-shadow: ${(props) =>
+    props.active ? "0 2px 4px 0 rgb(0 0 0/20%)" : "none"};
 `;
 
 const RegisterAdjust = styled(Button)`
   text-transform: none;
-  background: #fff;
-  color: #28740;
+  background: ${(props) => (props.active ? "#2874f0" : "#fff")};
+  color: ${(props) => (props.active ? "#fff" : "#2874f0")};
   height: 48px;
   border-radius: 2px;
-  box-shadow: 0 2px 4px 0 rgb(0 0 0/20%);
+  box-shadow: ${(props) =>
+    props.active ? "none" : "0 2px 4px 0 rgb(0 0 0/20%)"};
 `;
 
 const Login = () => {
@@ -52,6 +56,10 @@ const Login = () => {
     setAccount("login");
   };
 
+  const handleInputChange = (e) =>{
+    console.log(e.target.name,e.target.value)
+  }
+
   const imageURL =
     "https://www.sesta.it/wp-content/uploads/2021/03/logo-blog-sesta-trasparente.png";
 
@@ -63,20 +71,34 @@ const Login = () => {
           <Wrapper>
             <TextField variant="standard" label="Username" />
             <TextField variant="standard" label="Password" type="password" />
+
             <LoginAdjust variant="contained">Login</LoginAdjust>
             <p style={{ textAlign: "center" }}>OR</p>
-            <RegisterAdjust onClick={handleRegisterClick} variant="text">
+
+            <RegisterAdjust
+              onClick={handleRegisterClick}
+              variant="text"
+              active={account === "login"}
+            >
               Create an account
             </RegisterAdjust>
           </Wrapper>
         ) : (
           <Wrapper>
-            <TextField variant="standard" label="Name" />
-            <TextField variant="standard" label="Username" />
-            <TextField variant="standard" label="Password" type="password" />
-            <RegisterAdjust variant="contained">Register</RegisterAdjust>
+            <TextField variant="standard" onChange={(e) => handleInputChange(e)} name = 'name' label="Name" />
+            <TextField variant="standard" onChange={(e) => handleInputChange(e)} name = 'username' label="Create Username" />
+            <TextField variant="standard" onChange={(e) => handleInputChange(e)}  name = 'password'label="Password" type="password" />
+
+            <RegisterAdjust variant="contained" active={account === "register"}>
+              Register
+            </RegisterAdjust>
+
             <p style={{ textAlign: "center" }}>OR</p>
-            <LoginAdjust onClick={handleLoginClick} variant="text">
+            <LoginAdjust
+              onClick={handleLoginClick}
+              variant="text"
+              active={account === "register"}
+            >
               Already have an account
             </LoginAdjust>
           </Wrapper>
