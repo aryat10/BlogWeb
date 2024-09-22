@@ -45,6 +45,12 @@ const RegisterAdjust = styled(Button)`
     props.active ? "none" : "0 2px 4px 0 rgb(0 0 0/20%)"};
 `;
 
+const signupInitial = {
+  name: '',
+  username: '',
+  password: ''
+}
+
 const Login = () => {
   const [account, setAccount] = useState("login");
 
@@ -52,12 +58,14 @@ const Login = () => {
     setAccount("register");
   };
 
+  const [signup,setSignup] = useState(signupInitial)
+
   const handleLoginClick = () => {
     setAccount("login");
   };
 
   const handleInputChange = (e) =>{
-    console.log(e.target.name,e.target.value)
+    setSignup({...signup,[e.target.name]:e.target.value})
   }
 
   const imageURL =
