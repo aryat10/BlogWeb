@@ -25,7 +25,7 @@ app.use('/', router);
 // Database connection
 connection(USERNAME, PASSWORD);
 
-
+// Start the server
 const PORT = 8000;
 app.listen(PORT, () => {
     console.log(`Server running on PORT ${PORT} ✅`);
