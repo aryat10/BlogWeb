@@ -1,75 +1,134 @@
-import { useState } from "react";
-import { Box, TextField, Button, styled } from "@mui/material";
+import { useState, useEffect } from "react";
+import { Box, TextField, Button, styled, Typography } from "@mui/material";
+import { API } from '../../Service/api'
+
+
 
 const Component = styled(Box)`
-  width: 400px;
-  margin: auto;
-  box-shadow: 5px 2px 5px 2px rgb(0 0 0/ 0.6);
+    width: 400px;
+    margin: auto;
+    box-shadow: 5px 2px 5px 2px rgb(0 0 0/ 0.6);
 `;
 
-const Image = styled("img")({
-  width: 100,
-  margin: "auto",
-  display: "flex",
-  padding: "50px 0 0",
+const Image = styled('img')({
+    width: 100,
+    display: 'flex',
+    margin: 'auto',
+    padding: '50px 0 0'
 });
 
+
 const Wrapper = styled(Box)`
-  padding: 25px 35px;
-  display: flex;
-  flex-direction: column;
-  & > div,
-  & > button,
-  & > p {
-    margin-top: 20px;
-  }
+    padding: 25px 35px;
+    display: flex;
+    flex: 1;
+    overflow: auto;
+    flex-direction: column;
+    & > div, & > button, & > p {
+        margin-top: 20px;
+    }
 `;
 
-const LoginAdjust = styled(Button)`
-  text-transform: none;
-  background: ${(props) => (props.active ? "#fff" : "#fb641b")};
-  color: ${(props) => (props.active ? "#2874f0" : "#fff")};
-  height: 48px;
-  border-radius: 2px;
-  box-shadow: ${(props) =>
-    props.active ? "0 2px 4px 0 rgb(0 0 0/20%)" : "none"};
+const LoginButton = styled(Button)`
+    text-transform: none;
+    background: #FB641B;
+    color: #fff;
+    height: 48px;
+    border-radius: 2px;
 `;
 
-const RegisterAdjust = styled(Button)`
-  text-transform: none;
-  background: ${(props) => (props.active ? "#2874f0" : "#fff")};
-  color: ${(props) => (props.active ? "#fff" : "#2874f0")};
-  height: 48px;
-  border-radius: 2px;
-  box-shadow: ${(props) =>
-    props.active ? "none" : "0 2px 4px 0 rgb(0 0 0/20%)"};
+const SignupButton = styled(Button)`
+    text-transform: none;
+    background: #fff;
+    color: #2874f0;
+    height: 48px;
+    border-radius: 2px;
+    box-shadow: 0 2px 4px 0 rgb(0 0 0 / 20%);
 `;
 
-const signupInitial = {
-  name: '',
-  username: '',
-  password: ''
-}
+
+const Text = styled(Typography)`
+    color: #878787;
+    font-size: 12px;
+`;
+
+
+const Error = styled(Typography)`
+    font-size: 10px;
+    color: #ff6161;
+    line-height: 0;
+    margin-top: 10px;
+    font-weight: 600;
+`
+
+
+
+const loginInitialValues = {
+    username: '',
+    password: ''
+};
+
+
+const signupInitialValues = {
+    name: '',
+    username: '',
+    password: '',
+};
 
 const Login = () => {
-  const [account, setAccount] = useState("login");
 
-  const handleRegisterClick = () => {
-    setAccount("register");
-  };
 
-  const [signup,setSignup] = useState(signupInitial)
+    const [login, setLogin] = useState(loginInitialValues);
+    const [signup, setSignup] = useState(signupInitialValues);
+    const [error, showError] = useState('');
+    const [account, toggleAccount] = useState('login');
 
-  const handleLoginClick = () => {
-    setAccount("login");
-  };
 
-  const handleInputChange = (e) =>{
-    setSignup({...signup,[e.target.name]:e.target.value})
-  }
 
   const imageURL =
     "https://www.sesta.it/wp-content/uploads/2021/03/logo-blog-sesta-trasparente.png";
+
+
+    useEffect(() => {
+        showError(false);
+    }, [login])
+
+
+    const onValueChange = (e) => {
+        setLogin({ ...login, [e.target.name]: e.target.value });
+    }
+
+    const onInputChange = (e) => {
+        setSignup({ ...signup, [e.target.name]: e.target.value });
+    }
+
+
+
+    const loginUser = async () => {
+        let response = await API.userLogin(login);
+        if (response.isSuccess) {
+            showError('');
+        } else {
+            showError('Something went wrong! please try again later');
+        }
+    }
+
+
+
+    const signupUser = async () => {
+        let response = await API.userSignup(signup);
+        if (response.isSuccess) {
+            showError('');
+            setSignup(signupInitialValues);
+            toggleAccount('login');
+        } else {
+            showError('Something went wrong! please try again later');
+        }
+    }
+
+    const toggleSignup = () => {
+        account === 'signup' ? toggleAccount('login') : toggleAccount('signup');
+    }
 
   return (
     <Component>
@@ -77,38 +136,28 @@ const Login = () => {
         <Image src={imageURL} alt="Logo" />
         {account === "login" ? (
           <Wrapper>
-            <TextField variant="standard" label="Username" />
-            <TextField variant="standard" label="Password" type="password" />
+            <TextField variant="standard" value={login.username} onChange={(e) => onValueChange(e)} name='username' label='Enter Username' />
+            <TextField variant="standard" value={login.password} onChange={(e) => onValueChange(e)} name='password' label='Enter Password' />
 
-            <LoginAdjust variant="contained">Login</LoginAdjust>
-            <p style={{ textAlign: "center" }}>OR</p>
+            {error && <Error>{error}</Error>}
 
-            <RegisterAdjust
-              onClick={handleRegisterClick}
-              variant="text"
-              active={account === "login"}
-            >
-              Create an account
-            </RegisterAdjust>
+            <LoginButton variant="contained" onClick={() => loginUser()} >Login</LoginButton>
+            <Text style={{ textAlign: 'center' }}>OR</Text>
+
+            <SignupButton onClick={() => toggleSignup()} style={{ marginBottom: 50 }}>Create an account</SignupButton>
           </Wrapper>
         ) : (
           <Wrapper>
-            <TextField variant="standard" onChange={(e) => handleInputChange(e)} name = 'name' label="Name" />
-            <TextField variant="standard" onChange={(e) => handleInputChange(e)} name = 'username' label="Create Username" />
-            <TextField variant="standard" onChange={(e) => handleInputChange(e)}  name = 'password'label="Password" type="password" />
+            <TextField variant="standard" onChange={(e) => onInputChange (e)} name = 'name' label="Name" />
+            <TextField variant="standard" onChange={(e) => onInputChange(e)} name = 'username' label="Create Username" />
+            <TextField variant="standard" onChange={(e) => onInputChange(e)}  name = 'password'label="Password" type="password" />
 
-            <RegisterAdjust variant="contained" active={account === "register"}>
-              Register
-            </RegisterAdjust>
+            {error && <Error>{error}</Error>}    
 
-            <p style={{ textAlign: "center" }}>OR</p>
-            <LoginAdjust
-              onClick={handleLoginClick}
-              variant="text"
-              active={account === "register"}
-            >
-              Already have an account
-            </LoginAdjust>
+            <SignupButton onClick={() => signupUser()} >Signup</SignupButton>
+
+            <Text style={{ textAlign: 'center' }}>OR</Text>
+            <LoginButton variant="contained" onClick={() => toggleSignup()}>Already have an account</LoginButton>
           </Wrapper>
         )}
       </Box>
